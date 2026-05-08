@@ -1,7 +1,4 @@
 import random
-import security as sc
-import transfer as ts
-import basicfuncition as bf
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -32,23 +29,6 @@ def login(name,pin):#Verfica se existe um nome e pin igual no userdata
     print("Erro! Não Foi Localizado O Usuário.")
     activeuser = None
     return None
- 
-def RL(): # Tela para escolher entre registro e login
-    global app
-    app = tk.Tk()
-    app.geometry("500x500")
-    app.title('Banco')
-    app.columnconfigure((0,1,2), weight=1)
-    app.rowconfigure((0,1,2), weight=1)
-    bank = ttk.Label(app, text='Banco HP')
-    bank.grid(column=1, row=0, sticky=tk.N)
-    rbutton = ttk.Button(app, text='Registro', command=SR)
-    rbutton.grid(column=1, row=0, ipadx=5, ipady=5)
-    lbutton = ttk.Button(app, text='Login', command=SL)
-    lbutton.grid(column=1, row=1, ipadx=5, ipady=5)
-    sbutton = ttk.Button(app, text='Fechar', command=app.destroy)
-    sbutton.grid(column=1, row=2, ipadx=5, ipady=5)
-    app.mainloop()
 def SR(): # Função da tela de registro
     def getvalue():
         name = name_entry.get()
@@ -82,7 +62,6 @@ def SR(): # Função da tela de registro
     # Botão de registro
     button = ttk.Button(app, text='Registro', command=getvalue)
     button.grid(column=1, row=3, ipadx=5, ipady=5)
- 
 def SL(): # Função da tela de login
     def getlogin():
         name = name_entry.get()
@@ -114,6 +93,24 @@ def SL(): # Função da tela de login
     # Botão de login
     button = ttk.Button(app, text='login', command=getlogin)
     button.grid(column=1, row=3, ipadx=5, ipady=5)
+global app
+app = tk.Tk()
+app.geometry("500x500")
+app.title('Banco')
+app.columnconfigure((0,1,2), weight=1)
+app.rowconfigure((0,1,2), weight=1)
+bank = ttk.Label(app, text='Banco HP')
+bank.grid(column=1, row=0, sticky=tk.N)
+rbutton = ttk.Button(app, text='Registro', command=SR)
+rbutton.grid(column=1, row=0, ipadx=5, ipady=5)
+lbutton = ttk.Button(app, text='Login', command=SL)
+lbutton.grid(column=1, row=1, ipadx=5, ipady=5)
+sbutton = ttk.Button(app, text='Fechar', command=app.destroy)
+sbutton.grid(column=1, row=2, ipadx=5, ipady=5)
+def RL(): # Tela para escolher entre registro e login
+    app.mainloop()
+
+
 def MainS():
     app = tk.Toplevel()
     app.geometry('500x500')
@@ -152,8 +149,7 @@ def TS(): # Função de transferencia, saldo(saldo mostra o ID tambem) e sair
                     return
                 activeuser[3] -= transf
                 x[3] += transf
-                transfe = ttk.Label(toplev, text=f"Transferência realizada {transf} Reais enviados para: {user}")
-                transfe.grid(column=2,row=1)
+                messagebox.showinfo(title='Transferido!',message=f"Transferência realizada {transf} Reais enviados para: {user}")
                 return
         print("Usuário não encontrado")
     toplev = tk.Toplevel()
