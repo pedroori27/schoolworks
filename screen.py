@@ -16,19 +16,19 @@ class newuser: #Criei uma classe com as informações do novo usuario
                 self.id = random.randrange(1000000,9999999)
         self.pin = pin
         self.saldo = 1500
-def createuser(nam,pn): #
+def createuser(nam,pn): #Cria O Usuario A partir dos dados recebidos pela tela por meio dos parametros:
     new = newuser(nam,pn)
     newdata = [new.id,new.name,new.pin,new.saldo]
     usersdata.append(newdata)
     print(f"Usuario {new.name} Criado Com Sucesso! (ID: {new.id})")
     return new
-def login(name,pin):#Verfica se existe um nome e pin igual no userdata
+def login(name,pin): #Funçao de Login que define o usuario ativo
     global activeuser
     for user in usersdata:
-        if user[1] == name and user[2] == pin:
+        if user[1] == name and user[2] == pin: #Verfica se existe um nome e pin igual no userdata, se nao define o activeuser ao usuario logado
             activeuser = user
             return True
-    print("Erro! Não Foi Localizado O Usuário.")
+    print("Erro! Não Foi Localizado O Usuário.") 
     activeuser = None
     return None
 def SR(): # Função da tela de registro
