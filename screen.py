@@ -1,3 +1,5 @@
+# Me chamo Pedro
+# O tal do Recla
 import random
 import tkinter as tk
 from tkinter import ttk
