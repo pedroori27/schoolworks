@@ -1,5 +1,3 @@
-# Me chamo Pedro
-# O tal do Recla
 import random
 import tkinter as tk
 from tkinter import ttk
@@ -31,10 +29,10 @@ def login(name,pin): #Funçao de Login que define o usuario ativo
     print("Erro! Não Foi Localizado O Usuário.") 
     activeuser = None
     return None
-def SR(): # Função da tela de registro
-    def getvalue():
+def register(): # Função da tela de registro
+    def getValue(): #pega os valores digitados nas entrys e manda para função de criar usuario, depois fecha a tela
         name = name_entry.get()
-        print(name)  # agora está em uma variável
+        print(name)
         pin = password_entry.get()
         while len(pin) != 8:
             messagebox.showwarning(title='Aviso',message='A senha deve conter no minimo 8 digitos.')
@@ -62,16 +60,16 @@ def SR(): # Função da tela de registro
     password_entry = ttk.Entry(app, show='*')
     password_entry.grid(column=1, row=2)
     # Botão de registro
-    button = ttk.Button(app, text='Registro', command=getvalue)
+    button = ttk.Button(app, text='Registro', command=getValue)
     button.grid(column=1, row=3, ipadx=5, ipady=5)
-def SL(): # Função da tela de login
-    def getlogin():
+def Login(): # Função da tela de login
+    def getLogin(): #pega os valores digitados nas entrys e manda para função de fazer login, depois fecha a tela
         name = name_entry.get()
         pin = password_entry.get()
         login(name,pin)
         print(activeuser, usersdata)
         if activeuser != None:
-            MainS()
+            mainScreen()
             app.destroy()
         else:
             messagebox.showwarning(title='Aviso',message='Nome ou senha invalidos')
@@ -93,19 +91,21 @@ def SL(): # Função da tela de login
     password_entry = ttk.Entry(app, show='*')
     password_entry.grid(column=1, row=2)
     # Botão de login
-    button = ttk.Button(app, text='login', command=getlogin)
+    button = ttk.Button(app, text='login', command=getLogin)
     button.grid(column=1, row=3, ipadx=5, ipady=5)
+# Tela Principal
 global app
 app = tk.Tk()
 app.geometry("500x500")
 app.title('Banco')
 app.columnconfigure((0,1,2), weight=1)
 app.rowconfigure((0,1,2), weight=1)
+# definir os widgets e onde eles ficam
 bank = ttk.Label(app, text='Banco HP')
 bank.grid(column=1, row=0, sticky=tk.N)
-rbutton = ttk.Button(app, text='Registro', command=SR)
+rbutton = ttk.Button(app, text='Registro', command=register)
 rbutton.grid(column=1, row=0, ipadx=5, ipady=5)
-lbutton = ttk.Button(app, text='Login', command=SL)
+lbutton = ttk.Button(app, text='Login', command=Login)
 lbutton.grid(column=1, row=1, ipadx=5, ipady=5)
 sbutton = ttk.Button(app, text='Fechar', command=app.destroy)
 sbutton.grid(column=1, row=2, ipadx=5, ipady=5)
@@ -113,7 +113,7 @@ def RL(): # Tela para escolher entre registro e login
     app.mainloop()
 
 
-def MainS():
+def mainScreen(): # Tela principal do banco, onde o usuario pode escolher entre transferir, ver o saldo ou sair
     app = tk.Toplevel()
     app.geometry('500x500')
     app.title('Banco HP')
@@ -128,11 +128,11 @@ def MainS():
     menubutton["menu"] = menu
  
     # Adicionar opções
-    menu.add_checkbutton(label="Transferencia", command=TS)
-    menu.add_checkbutton(label="Saldo", command=SLL)
+    menu.add_checkbutton(label="Transferencia", command=transferScreen)
+    menu.add_checkbutton(label="Saldo", command=saldoSaqueDeposito)
     menu.add_checkbutton(label="Sair", command=app.destroy)
  
-def TS(): # Função de transferencia, saldo(saldo mostra o ID tambem) e sair
+def transferScreen(): # Função de transferencia
     def transation():
         user = id_entry.get()
         try:
@@ -154,11 +154,13 @@ def TS(): # Função de transferencia, saldo(saldo mostra o ID tambem) e sair
                 messagebox.showinfo(title='Transferido!',message=f"Transferência realizada {transf} Reais enviados para: {user}")
                 return
         print("Usuário não encontrado")
+    # tela de transferencia
     toplev = tk.Toplevel()
     toplev.title('Transferencia')
     toplev.geometry('500x500')
     toplev.columnconfigure((0,1,2), weight=1)
     toplev.rowconfigure((0,1,2), weight=1)
+    # definir os widgets e onde eles ficam
     id_label = ttk.Label(toplev, text='Nome:')
     id_label.grid(column=0, row=0)
     id_entry = ttk.Entry(toplev)
@@ -171,9 +173,9 @@ def TS(): # Função de transferencia, saldo(saldo mostra o ID tambem) e sair
     sbutton.grid(column=0, row=2)
     tbutton = ttk.Button(toplev, text='Transfira', command=transation)
     tbutton.grid(column=1, row=2)
-def SLL(): # Função de monstrar o Saldo, sacar e depositar
+def saldoSaqueDeposito(): # Função de monstrar o Saldo, sacar e depositar
     # função de saque e deposito
-    def sacc():
+    def sacc(): 
         value = int(s_label.get())
         if value <= activeuser[3] and value > 0:
             activeuser[3] = activeuser[3]-value
@@ -211,4 +213,4 @@ def SLL(): # Função de monstrar o Saldo, sacar e depositar
     sbutton.grid(column=2, row=2)
     button = ttk.Button(toplev, text='Fechar', command=toplev.destroy)
     button.grid(column=1, row=2)
-RL()
+RL() # Chama a função de escolher entre registro e login
