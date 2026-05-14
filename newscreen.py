@@ -1,3 +1,4 @@
+#Imports para a tela e numeros aleatorios
 import random
 import tkinter as tk
 from tkinter import ttk, messagebox, Menu
@@ -149,8 +150,7 @@ def getValueLogin(): # Pega o valor das entry para criar o login
     else:
         messagebox.showwarning(title='Aviso', message='Nome ou senha invalidos')
 
-def openHome(): 
-    # Esta função verifica o login, limpa as telas anteriores e atualiza a interface Home com o nome, saldo e ID do usuário logado.
+def openHome(): # Esta função verifica o login, limpa as telas anteriores e atualiza a interface Home com o nome, saldo e ID do usuário logado.
     if db.activeuser != None:
         rl.grid_remove()
         Transfer.grid_remove()
@@ -162,8 +162,7 @@ def openHome():
     else:
         messagebox.showerror(title='Aviso', message='Não está logado!')
 
-def opentransfer():
-    # Função que valida o acesso, limpa , esconde a Home e prepara a tela de transferência com o novo saldo
+def opentransfer():# Função que valida o acesso, limpa , esconde a Home e prepara a tela de transferência com o novo saldo
     if db.activeuser != None:
         wipeSecurity()
         Home.grid_remove()
