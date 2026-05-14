@@ -61,6 +61,8 @@ def tranferir(valor, destinatario_id):
     destinatario.saldo += valor
     tranferirBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}")
     messagebox.showinfo(title='Sucesso', message=f"Transferência de R${valor:.2f} realizada com sucesso para {destinatario.name}!")
+    tranferirEntryValor.delete(0, tk.END)
+    tranferirEntryDestinatario.delete(0, tk.END)
     return True
 
 def deposito(valor):
@@ -69,6 +71,7 @@ def deposito(valor):
         return False
     db.activeuser.saldo += valor
     homeBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}")
+    depositeEntry.delete(0, tk.END)
     return True
 
 def saque(valor):
@@ -80,6 +83,7 @@ def saque(valor):
         return False
     db.activeuser.saldo -= valor
     homeBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}")
+    withdrawEntry.delete(0, tk.END)
     return True
     
 # Funções primeiro!
@@ -90,6 +94,8 @@ def open_app(): # Abre o banco na tela de escolher entre registro e login
 
 def hide(): # esconder a janela se alguem tentar fechar com o x
     security.withdraw()
+    registerEntryName.delete(0, tk.END)
+    registerEntryPassword.delete(0, tk.END)
     wipeSecurity()
 
 def wipeSecurity(): # fecha todos os grid
@@ -119,6 +125,7 @@ def openLogin(): # tela de login
 def getValueRegister(): # Pega o valor das entry para criar o registro
     name = registerEntryName.get()
     pin = registerEntryPassword.get()
+    registerEntryPassword.delete(0, tk.END)
     if len(pin) < 8:
         messagebox.showwarning(title='Aviso', message='A senha deve conter no minimo 8 digitos.')
         security.lift()
@@ -126,16 +133,19 @@ def getValueRegister(): # Pega o valor das entry para criar o registro
         db.createuser(name, pin)
         messagebox.showinfo(title='Sucesso', message=f"Conta criada! {name}!")
         security.withdraw()
+        registerEntryName.delete(0, tk.END)
+
 
 def getValueLogin(): # Pega o valor das entry para criar o login
     name = loginEntryName.get()
     pin = loginEntryPassword.get()
-    
+    loginEntryPassword.delete(0, tk.END)
     if db.login(name, pin): # Chama o método de login da instância db
         print("Login efetuado")
         security.withdraw()
         openHome()
         print(f"Usuário Ativo: {db.activeuser}")
+        loginEntryPassword.delete(0, tk.END)
     else:
         messagebox.showwarning(title='Aviso', message='Nome ou senha invalidos')
 
