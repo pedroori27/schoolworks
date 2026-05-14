@@ -9,8 +9,8 @@ class newuser: #Criei uma classe com as informações do novo usuario
     def __init__(self, name, pin):
         self.name = name
         self.id = random.randrange(1000000,9999999) #Cria Um Id Aleatorio
-        for id in usersdata:
-            while id[0] == self.id: #Verifica Se Ja Existe o Id Se Não Cria um Novo
+        for u in usersdata: # Mudei 'id' para 'u' para não bugar a função id() do python
+            while u[0] == self.id: #Verifica Se Ja Existe o Id Se Não Cria um Novo
                 self.id = random.randrange(1000000,9999999)
         self.pin = pin
         self.saldo = 1500
@@ -34,9 +34,8 @@ def register(): # Função da tela de registro
         name = name_entry.get()
         print(name)
         pin = password_entry.get()
-        while len(pin) != 8:
-            messagebox.showwarning(title='Aviso',message='A senha deve conter no minimo 8 digitos.')
-            pin = password_entry.get()
+        if len(pin) != 8: # Mudei de while para if para não travar a janela
+            messagebox.showwarning(title='Aviso',message='A senha deve conter exatamente 8 digitos.')
             return
         createuser(name,pin)
         messagebox.showinfo(title='Aviso',message=f"Conta criada! {name}!")
@@ -55,8 +54,8 @@ def register(): # Função da tela de registro
     # Senha
     password_label = ttk.Label(app, text='Senha:')
     password_label.grid(column=1, row=2, sticky=tk.N)
-    password_label = ttk.Label(app, text='Pin Deve Conter 8 Caracteres.')
-    password_label.grid(column=1, row=3, sticky=tk.N)
+    password_info = ttk.Label(app, text='Pin Deve Conter 8 Caracteres.') # Troquei o nome da variavel para nao repetir
+    password_info.grid(column=1, row=3, sticky=tk.N)
     password_entry = ttk.Entry(app, show='*')
     password_entry.grid(column=1, row=2)
     # Botão de registro
@@ -128,24 +127,25 @@ def mainScreen(): # Tela principal do banco, onde o usuario pode escolher entre 
     menubutton["menu"] = menu
  
     # Adicionar opções
-    menu.add_checkbutton(label="Transferencia", command=transferScreen)
-    menu.add_checkbutton(label="Saldo", command=saldoSaqueDeposito)
-    menu.add_checkbutton(label="Sair", command=app.destroy)
+    menu.add_command(label="Transferencia", command=transferScreen) # Mudei para add_command
+    menu.add_command(label="Saldo", command=saldoSaqueDeposito)
+    menu.add_command(label="Sair", command=app.destroy)
  
 def transferScreen(): # Função de transferencia
     def transation():
-        user = id_entry.get()
         try:
+            user = int(id_entry.get())
             transf = int(give.get())
         except ValueError:
-            messagebox.showerror(title='Erro',message='Digite um valor válido')
+            messagebox.showerror(title='Erro',message='Digite apenas números válidos')
             return
+            
         print(user, transf)
-        if user == activeuser[1]:
+        if user == activeuser[0]:
             messagebox.showerror(title='Erro',message='Não é possível transferir para si mesmo')
             return
         for x in usersdata:
-            if x[1] == user:
+            if x[0] == user:
                 if transf > activeuser[3]:
                     messagebox.showerror(title='Erro',message='Saldo insuficiente')
                     return
@@ -153,7 +153,8 @@ def transferScreen(): # Função de transferencia
                 x[3] += transf
                 messagebox.showinfo(title='Transferido!',message=f"Transferência realizada {transf} Reais enviados para: {user}")
                 return
-        print("Usuário não encontrado")
+        messagebox.showerror(title='Erro', message="Usuário não encontrado")
+        
     # tela de transferencia
     toplev = tk.Toplevel()
     toplev.title('Transferencia')
@@ -161,7 +162,7 @@ def transferScreen(): # Função de transferencia
     toplev.columnconfigure((0,1,2), weight=1)
     toplev.rowconfigure((0,1,2), weight=1)
     # definir os widgets e onde eles ficam
-    id_label = ttk.Label(toplev, text='Nome:')
+    id_label = ttk.Label(toplev, text='ID:')
     id_label.grid(column=0, row=0)
     id_entry = ttk.Entry(toplev)
     id_entry.grid(column=1, row=0)
@@ -176,21 +177,29 @@ def transferScreen(): # Função de transferencia
 def saldoSaqueDeposito(): # Função de monstrar o Saldo, sacar e depositar
     # função de saque e deposito
     def sacc(): 
-        value = int(s_label.get())
-        if value <= activeuser[3] and value > 0:
-            activeuser[3] = activeuser[3]-value
-            print(value, activeuser[3])
-            balance_label.config(text=f"Saldo: R${activeuser[3]},00")
-        else:
-            messagebox.showerror(title='Erro',message='Valor invalido')
+        try:
+            value = int(s_label.get())
+            if value <= activeuser[3] and value > 0:
+                activeuser[3] = activeuser[3]-value
+                print(value, activeuser[3])
+                balance_label.config(text=f"Saldo: R${activeuser[3]},00")
+            else:
+                messagebox.showerror(title='Erro',message='Valor invalido ou saldo insuficiente')
+        except ValueError:
+            messagebox.showerror(title='Erro',message='Digite um valor numérico')
+
     def deposit():
-        value = int(d_label.get())
-        if value > 0:
-            activeuser[3] = activeuser[3] + value
-            print("Depósito concluído com sucesso!")
-            balance_label.config(text=f"Saldo: R${activeuser[3]}")
-        else:
-            messagebox.showerror(title='Erro',message='Valor invalido')
+        try:
+            value = int(d_label.get())
+            if value > 0:
+                activeuser[3] = activeuser[3] + value
+                print("Depósito concluído com sucesso!")
+                balance_label.config(text=f"Saldo: R${activeuser[3]},00")
+            else:
+                messagebox.showerror(title='Erro',message='Valor invalido')
+        except ValueError:
+            messagebox.showerror(title='Erro',message='Digite um valor numérico')
+
     # tela
     toplev = tk.Toplevel()
     toplev.title('Saldo')
@@ -200,7 +209,7 @@ def saldoSaqueDeposito(): # Função de monstrar o Saldo, sacar e depositar
     # Texto mostrando o nome, id e dinheiro guardado
     idname_label = ttk.Label(toplev, text=f"Olá {activeuser[1]}! (ID: {activeuser[0]})")
     idname_label.grid(column=1,row=0)
-    balance_label = ttk.Label(toplev, text=f"Saldo: R${activeuser[3]}")
+    balance_label = ttk.Label(toplev, text=f"Saldo: R${activeuser[3]},00")
     balance_label.grid(column=1,row=1, sticky=tk.N)
     # Depositar, Sacar e fechar a tela.
     d_label = ttk.Entry(toplev)
