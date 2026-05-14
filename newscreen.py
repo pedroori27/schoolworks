@@ -43,7 +43,7 @@ class DataBank: #Criei uma classe para guardar os dados dos usuarios e o usuario
         return False
 # Instância global do banco de dados
 db = DataBank()
-def tranferir(valor, destinatario_id):
+def tranferir(valor, destinatario_id): #Funçao para tranferir verificando se o usuario existe,nao é ele mesmo e se o valor é maior que o saldo
     if destinatario_id not in db.usersdata:
         messagebox.showerror(title='Aviso', message='Destinatário não encontrado.')
         return False
@@ -65,7 +65,7 @@ def tranferir(valor, destinatario_id):
     tranferirEntryDestinatario.delete(0, tk.END)
     return True
 
-def deposito(valor):
+def deposito(valor): #Função Deposito 
     if valor <= 0:
         messagebox.showerror(title='Aviso', message='Valor de depósito inválido.')
         return False
@@ -74,7 +74,7 @@ def deposito(valor):
     depositeEntry.delete(0, tk.END)
     return True
 
-def saque(valor):
+def saque(valor): #Função para Saque verifica alguns ifs e desconta o saldo do active user
     if valor <= 0:
         messagebox.showerror(title='Aviso', message='Valor de saque inválido.')
         return False
@@ -149,7 +149,8 @@ def getValueLogin(): # Pega o valor das entry para criar o login
     else:
         messagebox.showwarning(title='Aviso', message='Nome ou senha invalidos')
 
-def openHome():
+def openHome(): 
+    # Esta função verifica o login, limpa as telas anteriores e atualiza a interface Home com o nome, saldo e ID do usuário logado.
     if db.activeuser != None:
         rl.grid_remove()
         Transfer.grid_remove()
@@ -160,7 +161,9 @@ def openHome():
         Home.grid(row=0, column=0, sticky="nsew")
     else:
         messagebox.showerror(title='Aviso', message='Não está logado!')
+
 def opentransfer():
+    # Função que valida o acesso, limpa , esconde a Home e prepara a tela de transferência com o novo saldo
     if db.activeuser != None:
         wipeSecurity()
         Home.grid_remove()
