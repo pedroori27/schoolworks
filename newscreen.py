@@ -43,41 +43,43 @@ class DataBank: #Criei uma classe para guardar os dados dos usuarios e o usuario
         return False
 # Instância global do banco de dados
 db = DataBank()
-
 def tranferir(valor, destinatario_id):
     if destinatario_id not in db.usersdata:
-        print("Destinatário não encontrado.")
+        messagebox.showerror(title='Aviso', message='Destinatário não encontrado.')
         return False
-
+    if destinatario_id == db.activeuser.id:
+        messagebox.showerror(title='Aviso', message='Não é possível transferir para si mesmo.')
+        return False
     destinatario = db.usersdata[destinatario_id]
 
     if db.activeuser.saldo < valor:
-        print("Saldo insuficiente para realizar a transferência.")
+        messagebox.showwarning(title='Aviso', message='Saldo insuficiente para realizar a transferência.')
         return False
 
     # Realiza a transferência
     db.activeuser.saldo -= valor
     destinatario.saldo += valor
-    print(f"Transferência de {valor} realizada com sucesso para {destinatario.name}.")
+    tranferirBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}")
+    messagebox.showinfo(title='Sucesso', message=f"Transferência de R${valor:.2f} realizada com sucesso para {destinatario.name}!")
     return True
 
 def deposito(valor):
     if valor <= 0:
-        print("Valor de depósito inválido.")
+        messagebox.showerror(title='Aviso', message='Valor de depósito inválido.')
         return False
     db.activeuser.saldo += valor
-    print(f"Depósito de {valor} realizado com sucesso. Saldo atual: {db.activeuser.saldo}")
+    homeBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}")
     return True
 
 def saque(valor):
     if valor <= 0:
-        print("Valor de saque inválido.")
+        messagebox.showerror(title='Aviso', message='Valor de saque inválido.')
         return False
     if db.activeuser.saldo < valor:
-        print("Saldo insuficiente para realizar o saque.")
+        messagebox.showwarning(title='Aviso', message='Saldo insuficiente para realizar o saque.')
         return False
     db.activeuser.saldo -= valor
-    print(f"Saque de {valor} realizado com sucesso. Saldo atual: {db.activeuser.saldo}")
+    homeBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}")
     return True
     
 # Funções primeiro!
@@ -140,15 +142,28 @@ def getValueLogin(): # Pega o valor das entry para criar o login
 def openHome():
     if db.activeuser != None:
         rl.grid_remove()
+        Transfer.grid_remove()
         # Atualiza o texto da Home com o nome do usuário
-        HomeTitle.config(text=f"Bem Vindo, {db.activeuser.name}!")
+        homeTitle.config(text=f"Bem Vindo, {db.activeuser.name}!", foreground="white", background="black", font=("Arial", 14, "bold"))
+        homeBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}", foreground="white", background="black", font=("Arial", 12))
+        homeId.config(text=f"ID: {db.activeuser.id}", foreground="white", background="black", font=("Arial", 12))
         Home.grid(row=0, column=0, sticky="nsew")
     else:
         messagebox.showerror(title='Aviso', message='Não está logado!')
+def opentransfer():
+    if db.activeuser != None:
+        wipeSecurity()
+        Home.grid_remove()
+        tranferirBalance.config(text=f"Saldo: R${db.activeuser.saldo:.2f}")
+        Transfer.grid(row=0, column=0, sticky="nsew")
+    else:
+        messagebox.showerror(title='Aviso', message='Não está logado!')
 
-def loggedOff():
-    db.activeuser = None # Limpa o usuário ativo
+def loggedOff(): # Limpa o usuário ativo
     Home.grid_remove()
+    Transfer.grid_remove()
+    db.activeuser = None
+    messagebox.showinfo(title='Deslogado', message='Usuário deslogado com sucesso!')
     rl.grid(row=0, column=0, sticky="nsew")
 
 # Tela principal
@@ -163,6 +178,7 @@ menubar = Menu(bank)
 bank.config(menu=menubar)
 menu = Menu(menubar, tearoff=0)
 menu.add_command(label='Home', command=openHome)
+menu.add_command(label='Transferência', command=opentransfer)
 menu.add_command(label='Logout', command=loggedOff)
 menubar.add_cascade(label="Menu", menu=menu)
 
@@ -188,18 +204,22 @@ Login = tk.Frame(security)
 Login.columnconfigure((0), weight=1)
 Login.rowconfigure((0,1,2,3), weight=1)
 
-Home = tk.Frame(bank, bg="white") # Mudei para white para ler o texto preto
+Home = tk.Frame(bank, bg="black")
 Home.columnconfigure((0,1,2), weight=1)
 Home.rowconfigure((0,1,2), weight=1)
+
+Transfer = tk.Frame(bank, bg="black")
+Transfer.columnconfigure((0,1,2), weight=1)
+Transfer.rowconfigure((0,1,2), weight=1)
 
 # Widgets: Registro e login (Tela Inicial)
 bankTitle = ttk.Label(rl, text='Banco HP', background="lightgray", font=("Arial", 16))
 bankTitle.grid(row=0, column=1, sticky='n', pady=30)
-buttomRegister = ttk.Button(rl, text="Registro", command=openRegister)
+buttomRegister = ttk.Button(rl, text="Registro", command=openRegister, style="TButton")
 buttomRegister.grid(row=0, column=1)
-buttomLogin = ttk.Button(rl, text="Login", command=openLogin)
+buttomLogin = ttk.Button(rl, text="Login", command=openLogin, style="TButton")
 buttomLogin.grid(row=1, column=1)
-buttomClose = ttk.Button(rl, text="Sair", command=bank.destroy)
+buttomClose = ttk.Button(rl, text="Sair", command=bank.destroy, style="TButton")
 buttomClose.grid(row=2, column=1)
 
 # Widgets: Fazer registro
@@ -210,7 +230,7 @@ registerEntryName.grid(row=1, column=0, pady=5)
 ttk.Label(Register, text='Senha').grid(row=2, column=0, sticky='n')
 registerEntryPassword = ttk.Entry(Register, show='*')
 registerEntryPassword.grid(row=2, column=0, pady=5)
-ttk.Button(Register, text="Registrar", command=getValueRegister).grid(row=3, column=0, pady=20)
+ttk.Button(Register, text="Registrar", command=getValueRegister, style="TButton").grid(row=3, column=0, pady=20)
 
 # Widgets: Fazer login
 ttk.Label(Login, text='Login', font=("Arial", 12, "bold")).grid(row=0, column=0, pady=10)
@@ -220,11 +240,39 @@ loginEntryName.grid(row=1, column=0, pady=5)
 ttk.Label(Login, text='Senha').grid(row=2, column=0, sticky='n')
 loginEntryPassword = ttk.Entry(Login, show='*')
 loginEntryPassword.grid(row=2, column=0, pady=5)
-ttk.Button(Login, text="Logar", command=getValueLogin).grid(row=3, column=0, pady=20)
+ttk.Button(Login, text="Logar", command=getValueLogin, style="TButton").grid(row=3, column=0, pady=20)
 
 # Widgets: Home pós login
-HomeTitle = ttk.Label(Home, text="Bem Vindo", font=("Arial", 14))
-HomeTitle.grid(row=0, column=1)
-
+homeTitle = ttk.Label(Home, text="Bem Vindo", font=("Arial", 14), foreground="white", background="black")
+homeTitle.grid(row=0, column=1)
+homeId = ttk.Label(Home, text="bem vindo", font=("Arial", 12), foreground="white", background="black")
+homeId.grid(row=0, column=1, sticky='s')
+homeBalance = ttk.Label(Home, text="Bem Vindo", font=("Arial", 14), foreground="white", background="black")
+homeBalance.grid(row=1, column=1)
+buttomHome = ttk.Button(Home, text="Sair", command=loggedOff, style="TButton")
+buttomHome.grid(row=2, column=1)
+depositeEntry = ttk.Entry(Home)
+depositeEntry.grid(row=1, column=2)
+depositeButton = ttk.Button(Home, text="Depositar", command=lambda: deposito(float(depositeEntry.get())), style="TButton")
+depositeButton.grid(row=2, column=2, pady=5)
+withdrawEntry = ttk.Entry(Home)
+withdrawEntry.grid(row=1, column=0)
+withdrawButton = ttk.Button(Home, text="Sacar", command=lambda: saque(float(withdrawEntry.get())), style="TButton")
+withdrawButton.grid(row=2, column=0, pady=5)
+#  widget: Transferencia
+transferTitle = ttk.Label(Transfer, text="Transferência", font=("Arial", 14), foreground="white", background="black")
+transferTitle.grid(row=0, column=1)
+tranferirBalance = ttk.Label(Transfer, text="Saldo: R$0.00", font=("Arial", 12), foreground="white", background="black")
+tranferirBalance.grid(row=0, column=1, sticky='s')
+tranferirLabelValor = ttk.Label(Transfer, text="Valor", font=("Arial", 12), foreground="white", background="black")
+tranferirLabelValor.grid(row=1, column=1, sticky='n')
+tranferirEntryValor = ttk.Entry(Transfer)
+tranferirEntryValor.grid(row=1, column=1)
+tranferirLabelDestinatario = ttk.Label(Transfer, text="Destinatário", font=("Arial", 12), foreground="white", background="black")
+tranferirLabelDestinatario.grid(row=2, column=1, sticky='n')
+tranferirEntryDestinatario = ttk.Entry(Transfer)
+tranferirEntryDestinatario.grid(row=2, column=1)
+tranferirButton = ttk.Button(Transfer, text="Transferir", style="TButton", command=lambda: tranferir(float(tranferirEntryValor.get()), int(tranferirEntryDestinatario.get())))
+tranferirButton.grid(row=3, column=1, pady=20)
 # Iniciar aplicação
 open_app()
